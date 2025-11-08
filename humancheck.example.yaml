@@ -1,0 +1,54 @@
+# Humancheck Configuration Example
+# Copy this file to humancheck.yaml and customize for your environment
+
+# API Server Configuration
+api_host: 0.0.0.0
+api_port: 8000
+
+# Streamlit Dashboard Configuration
+streamlit_host: 0.0.0.0
+streamlit_port: 8501
+
+# Database Configuration
+# For SQLite (development)
+storage: sqlite
+db_path: ./humancheck.db
+
+# For PostgreSQL (production)
+# storage: postgresql
+# db_url: postgresql+asyncpg://user:password@localhost/humancheck
+
+# Review Configuration
+confidence_threshold: 0.8  # Reviews required when confidence < 0.8
+require_review_for:
+  - high-stakes
+  - compliance
+  - payment
+  - data_deletion
+
+# Default Reviewers
+# Fallback reviewers when no routing rules match
+default_reviewers:
+  - admin@example.com
+
+# Logging
+log_level: INFO  # DEBUG, INFO, WARNING, ERROR, CRITICAL
+log_file: null   # Set path to enable file logging
+
+# MCP Configuration
+mcp_server_name: humancheck
+mcp_version: 0.1.0
+
+# Security (optional)
+enable_auth: false
+api_key: null  # Set API key for authentication
+
+# Multi-tenancy
+default_organization_name: Default Organization
+
+# Notification Settings (future)
+# notifications:
+#   slack_webhook: null
+#   email_enabled: false
+#   email_smtp_host: smtp.gmail.com
+#   email_smtp_port: 587
