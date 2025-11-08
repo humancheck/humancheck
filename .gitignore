@@ -76,3 +76,22 @@ temp/
 *.tmp
 
 architecture/
+
+# Platform-specific (proprietary)
+PLATFORM_STRATEGY.md
+PLATFORM_REPO_STRUCTURE.md
+CONNECTOR_CONFIG_EXPLAINED.md
+IMPLEMENTATION_SUMMARY.md
+
+# Development/migration scripts
+check_decisions.py
+fix_review_statuses.py
+init_connector_tables.py
+test_db.py
+QUICK_TEST.md
+
+# Storage (user data)
+storage/
+
+# Memory dumps
+:memory:
