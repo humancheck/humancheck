@@ -10,7 +10,7 @@ Humancheck enables AI agents to escalate uncertain or high-stakes decisions to h
   - REST API (universal)
   - LangChain/LangGraph
   - Extensible for custom frameworks
-  - **Platform**: MCP (Claude Desktop native) - requires server
+  - **Platform**: MCP 
 
 - **Intelligent Routing**: Route reviews to the right people based on configurable rules
   - Rule-based assignment by task type, urgency, confidence score
@@ -126,70 +126,49 @@ async with httpx.AsyncClient() as client:
         print(decision.json())
 ```
 
-### MCP Integration (Claude Desktop) - Platform Only
-
-<Note>
-MCP integration requires a server and is only available in [Humancheck Platform](https://platform.humancheck.dev).
-</Note>
-
-Add to your Claude Desktop MCP configuration:
-
-```json
-{
-  "mcpServers": {
-    "humancheck": {
-      "command": "humancheck",
-      "args": ["mcp"],
-      "env": {
-        "HUMANCHECK_API_URL": "https://api.humancheck.dev",
-        "HUMANCHECK_API_KEY": "your-api-key-here"
-      }
-    }
-  }
-}
-```
-
-Then in Claude:
-
-```
-I need to process a $10,000 payment. Let me request human review first.
-
-<uses request_review tool>
-```
+For a complete example, see [`examples/basic_agent.py`](examples/basic_agent.py).
 
 ### LangChain/LangGraph Integration
 
+Use the `HumancheckLangchainAdapter` to automatically intercept tool calls and request human approval:
+
 ```python
-from langchain.agents import AgentExecutor
-import httpx
+from langchain.agents import create_agent
+from langchain_core.tools import tool
+from langchain_openai import ChatOpenAI
+from langgraph.checkpoint.memory import MemorySaver
+from humancheck.adapters.langchain import HumancheckLangchainAdapter
 
-# In your LangChain agent
-async def execute_with_review(proposed_action, confidence):
-    if confidence < 0.9:
-        # Request review at interrupt point
-        async with httpx.AsyncClient() as client:
-            response = await client.post(
-                "http://localhost:8000/reviews",
-                json={
-                    "task_type": "sql_execution",
-                    "proposed_action": proposed_action,
-                    "confidence_score": confidence,
-                    "framework": "langchain",
-                    "blocking": True,  # Wait for decision
-                }
-            )
-            decision = response.json()
+@tool
+def write_file(filename: str, content: str) -> str:
+    """Write content to a file."""
+    return f"File '{filename}' written"
 
-            if decision["decision"] == "approve":
-                # Continue execution
-                return execute_action(proposed_action)
-            elif decision["decision"] == "modify":
-                # Use modified action
-                return execute_action(decision["modified_action"])
-            else:
-                # Rejected
-                return None
+# Create agent with Humancheck adapter
+model = ChatOpenAI(model="gpt-4")
+tools = [write_file]
+
+agent = create_agent(
+    model,
+    tools,
+    middleware=[
+        HumancheckLangchainAdapter(
+            api_url="http://localhost:8000",  # Self-hosted
+            tools_requiring_approval={
+                "write_file": True,  # Require approval for this tool
+            }
+        )
+    ],
+    checkpointer=MemorySaver(),
+)
+
+# Use the agent - it will automatically pause for approval when needed
+result = await agent.ainvoke({"messages": [("user", "Write a file")]})
 ```
+
+For complete examples:
+- Self-hosted: [`examples/langchain_hitl_example.py`](examples/langchain_hitl_example.py)
+- Platform: [`examples/langchain_platform_example.py`](examples/langchain_platform_example.py)
 
 ## Architecture
 
