@@ -1,5 +1,5 @@
 [project]
-name = "humancheck"
+name = "humancheck-core"
 version = "0.1.0"
 description = "A universal human-in-the-loop operations platform for AI agents"
 authors = [
