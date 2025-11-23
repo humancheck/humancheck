@@ -1,18 +1,16 @@
-[tool.poetry]
+[project]
 name = "humancheck"
 version = "0.1.0"
 description = "A universal human-in-the-loop operations platform for AI agents"
-authors = ["Humancheck <hi@humancheck.dev>"]
+authors = [
+    {name = "Humancheck", email = "hi@humancheck.dev"}
+]
 readme = "README.md"
 license = "MIT"
-homepage = "https://humancheck.dev"
-repository = "https://github.com/humancheck/humancheck"
-documentation = "https://docs.humancheck.dev"
 keywords = ["ai", "human-in-the-loop", "hitl", "review", "approval", "ai-agents", "langchain", "mcp"]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
-    "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
@@ -20,22 +18,16 @@ classifiers = [
     "Topic :: Software Development :: Libraries :: Python Modules",
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
 ]
-packages = [
-    {include = "humancheck", from = "src"},
-    {include = "frontend", from = "."},
-]
-exclude = [
-    "*.db",
-    "*.sqlite",
-    "*.sqlite3",
-    "humancheck.yaml",
-    "storage/",
-    ":memory:",
-    "venv/",
-    ".pytest_cache/",
-    "__pycache__/",
-    "*.pyc",
-]
+requires-python = ">=3.10"
+dynamic = ["dependencies"]
+
+[project.urls]
+Homepage = "https://humancheck.dev"
+Repository = "https://github.com/humancheck/humancheck"
+Documentation = "https://docs.humancheck.dev"
+
+[project.scripts]
+humancheck = "humancheck.__main__:cli"
 
 [tool.poetry.dependencies]
 python = "^3.10"
@@ -58,14 +50,6 @@ mcp = "^1.0.0"
 slack-sdk = "^3.27.0"
 aiohttp = "^3.13.2"
 
-[tool.poetry.group.dev.dependencies]
-pytest = "^8.0.0"
-pytest-asyncio = "^0.23.0"
-black = "^24.0.0"
-ruff = "^0.5.0"
-mypy = "^1.8.0"
-httpx = "^0.27.0"
-
 [tool.poetry.group.langchain]
 optional = true
 
@@ -75,8 +59,31 @@ langgraph = "^0.2.0"
 langchain-openai = "^0.2.0"
 langchain-core = "^0.3.0"
 
-[tool.poetry.scripts]
-humancheck = "humancheck.__main__:cli"
+[tool.poetry]
+packages = [
+    {include = "humancheck", from = "src"},
+    {include = "frontend", from = "."},
+]
+exclude = [
+    "*.db",
+    "*.sqlite",
+    "*.sqlite3",
+    "humancheck.yaml",
+    "storage/",
+    ":memory:",
+    "venv/",
+    ".pytest_cache/",
+    "__pycache__/",
+    "*.pyc",
+]
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.0.0"
+pytest-asyncio = "^0.23.0"
+black = "^24.0.0"
+ruff = "^0.5.0"
+mypy = "^1.8.0"
+httpx = "^0.27.0"
 
 [tool.black]
 line-length = 100
