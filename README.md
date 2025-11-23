@@ -41,7 +41,7 @@ Humancheck enables AI agents to escalate uncertain or high-stakes decisions to h
 ### Installation
 
 ```bash
-pip install humancheck
+pip install humancheck-core
 ```
 
 Or install from source:
