@@ -82,13 +82,18 @@ PLATFORM_STRATEGY.md
 PLATFORM_REPO_STRUCTURE.md
 CONNECTOR_CONFIG_EXPLAINED.md
 IMPLEMENTATION_SUMMARY.md
+PREVIEW_LAYER_README.md
+CONNECTORS.md
 
 # Development/migration scripts
 check_decisions.py
 fix_review_statuses.py
 init_connector_tables.py
 test_db.py
+test_hitl_integration.py
+test_preview_layer.py
 QUICK_TEST.md
+QUICKSTART.md
 
 # Storage (user data)
 storage/

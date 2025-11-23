@@ -1,4 +1,4 @@
-# Humancheck 🤖✋
+# Humancheck
 
 **A universal human-in-the-loop (HITL) operations platform for AI agents**
 
@@ -9,7 +9,6 @@ Humancheck enables AI agents to escalate uncertain or high-stakes decisions to h
 - **🔌 Universal Integration**: Works with any AI framework via adapter pattern
   - REST API (universal)
   - LangChain/LangGraph
-  - Mastra
   - Extensible for custom frameworks
   - **Platform**: MCP (Claude Desktop native) - requires server
 
@@ -324,7 +323,7 @@ Once running, visit:
 ### Core Features (Open Source)
 
 - [x] Core HITL functionality
-- [x] Framework adapters (REST, LangChain, Mastra)
+- [x] Framework adapters (REST, LangChain)
 - [x] Basic routing (config-based)
 - [x] Attachments and preview
 - [x] Connectors (Slack, email)

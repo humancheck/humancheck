@@ -103,12 +103,31 @@ def start(config: str, host: str, port: int, dashboard: bool):
             import os
             from pathlib import Path
 
-            # Find the streamlit app
-            frontend_dir = Path(__file__).parent.parent.parent / "frontend"
-            streamlit_app = frontend_dir / "streamlit_app.py"
+            # Find the streamlit app - try installed package first, then fallback to dev path
+            streamlit_app = None
+            try:
+                # Try to find in installed package using importlib.resources
+                try:
+                    import importlib.resources.files as resources_files
+                    frontend_pkg = resources_files("frontend")
+                    streamlit_app = frontend_pkg / "streamlit_app.py"
+                    if not streamlit_app.exists():
+                        streamlit_app = None
+                except (ModuleNotFoundError, AttributeError):
+                    # Fallback for older Python versions
+                    import importlib.resources
+                    with importlib.resources.path("frontend", "streamlit_app.py") as app_path:
+                        streamlit_app = app_path
+            except (ModuleNotFoundError, FileNotFoundError, TypeError):
+                streamlit_app = None
 
-            if not streamlit_app.exists():
-                click.echo(f"Warning: Dashboard app not found at {streamlit_app}", err=True)
+            # Fallback to development path if not found in package
+            if not streamlit_app or not streamlit_app.exists():
+                frontend_dir = Path(__file__).parent.parent.parent / "frontend"
+                streamlit_app = frontend_dir / "streamlit_app.py"
+
+            if not streamlit_app or not streamlit_app.exists():
+                click.echo(f"Warning: Dashboard app not found. Please ensure frontend/streamlit_app.py exists.", err=True)
             else:
                 dashboard_process = subprocess.Popen(
                     [

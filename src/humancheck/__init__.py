@@ -6,8 +6,7 @@ high-stakes decisions to human reviewers for approval.
 __version__ = "0.1.0"
 
 from .adapters import (
-    LangChainAdapter,
-    MastraAdapter,
+    HumancheckLangchainAdapter,
     McpAdapter,
     RestAdapter,
     ReviewAdapter,
@@ -44,8 +43,7 @@ __all__ = [
     "UniversalReview",
     "RestAdapter",
     "McpAdapter",
-    "LangChainAdapter",
-    "MastraAdapter",
+    "HumancheckLangchainAdapter",
     "get_registry",
     "register_adapter",
     "get_adapter",

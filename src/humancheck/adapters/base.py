@@ -43,7 +43,7 @@ class UniversalReview:
 class ReviewAdapter(ABC):
     """Base adapter interface for framework integrations.
 
-    Each AI framework (LangChain, Mastra, MCP, etc.) implements this interface
+    Each AI framework (LangChain, MCP, etc.) implements this interface
     to convert their specific request format into UniversalReview and vice versa.
     """
 
@@ -77,7 +77,7 @@ class ReviewAdapter(ABC):
         """Get the name of the framework this adapter supports.
 
         Returns:
-            Framework name (e.g., 'langchain', 'mastra', 'mcp', 'rest')
+            Framework name (e.g., 'langchain', 'mcp', 'rest')
         """
         pass
 

@@ -2,9 +2,40 @@
 name = "humancheck"
 version = "0.1.0"
 description = "A universal human-in-the-loop operations platform for AI agents"
-authors = ["Your Name <you@example.com>"]
+authors = ["Humancheck <hi@humancheck.dev>"]
 readme = "README.md"
-packages = [{include = "humancheck", from = "src"}]
+license = "MIT"
+homepage = "https://humancheck.dev"
+repository = "https://github.com/humancheck/humancheck"
+documentation = "https://docs.humancheck.dev"
+keywords = ["ai", "human-in-the-loop", "hitl", "review", "approval", "ai-agents", "langchain", "mcp"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+packages = [
+    {include = "humancheck", from = "src"},
+    {include = "frontend", from = "."},
+]
+exclude = [
+    "*.db",
+    "*.sqlite",
+    "*.sqlite3",
+    "humancheck.yaml",
+    "storage/",
+    ":memory:",
+    "venv/",
+    ".pytest_cache/",
+    "__pycache__/",
+    "*.pyc",
+]
 
 [tool.poetry.dependencies]
 python = "^3.10"

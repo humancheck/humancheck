@@ -12,13 +12,10 @@ from pathlib import Path
 
 import streamlit as st
 
-# Add parent directory to path for imports
-sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
-
+# Import humancheck - works both in development and when installed
 from humancheck.config import get_config, init_config
 from humancheck.database import init_db
 from humancheck.models import Attachment, Decision, DecisionType, Review, ReviewStatus
-from humancheck.platform_models import User
 from humancheck.dashboard.preview import render_preview_panel
 
 

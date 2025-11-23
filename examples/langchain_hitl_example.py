@@ -1,18 +1,15 @@
-"""Example: LangChain HITL Middleware with Humancheck
+"""Example: LangChain with Humancheck Adapter (Self-Hosted)
 
-This example demonstrates how to integrate LangChain's Human-in-the-Loop (HITL)
-middleware with humancheck's dashboard for agent oversight.
+This example demonstrates how to use Humancheck's LangChain adapter with a self-hosted instance.
 
 Setup:
     1. Install dependencies: pip install langchain langgraph langchain-openai
-    2. Start humancheck API: humancheck api
-    3. Start Streamlit dashboard: streamlit run frontend/streamlit_app.py
-    4. Set OPENAI_API_KEY environment variable
-    5. Run this example: python examples/langchain_hitl_example.py
+    2. Start humancheck: humancheck start
+    3. Set OPENAI_API_KEY environment variable
+    4. Run this example: python examples/langchain_hitl_example.py
 
-The example creates an agent with tools that require human approval. When the
-agent tries to execute these tools, humancheck intercepts the calls and shows
-them in the dashboard for review.
+The example creates an agent with HumancheckLangchainAdapter that automatically
+intercepts tool calls and sends them to your self-hosted Humancheck instance for review.
 """
 
 import asyncio
@@ -143,10 +140,18 @@ async def handle_tool_calls_with_humancheck(tool_calls, db_session_factory, conf
     Returns:
         List of decisions for each tool call
     """
-    from humancheck.adapters.langchain_hitl import LangChainHITLAdapter
-    from humancheck.api import create_review
-
-    adapter = LangChainHITLAdapter(db_session_factory)
+    from humancheck.adapters.langchain import HumancheckLangchainAdapter
+    
+    # For self-hosted, use local API URL
+    adapter = HumancheckLangchainAdapter(
+        api_url="http://localhost:8000",
+        api_key=None,  # No auth needed for local
+        tools_requiring_approval={
+            "write_file": ["approve", "edit", "reject"],
+            "execute_sql": ["approve", "reject"],
+            "send_email": ["approve", "edit", "reject"],
+        }
+    )
 
     # Define which tools require which approvals
     tool_approval_rules = {
@@ -306,17 +311,20 @@ async def simple_example():
     print("\n1️⃣  Initializing humancheck...")
     from humancheck.config import init_config
     from humancheck.database import init_db
-    from humancheck.adapters.langchain_hitl import LangChainHITLAdapter
-    from humancheck.api import create_review
+    from humancheck.adapters.langchain import HumancheckLangchainAdapter
+    import httpx
 
-    config = init_config()
-    db = init_db(config.get_database_url())
-    await db.create_tables()
+    print("✅ Using Humancheck adapter")
 
-    print("✅ Database initialized")
-
-    # Create adapter
-    adapter = LangChainHITLAdapter(db.session)
+    # Create adapter for self-hosted instance
+    adapter = HumancheckLangchainAdapter(
+        api_url="http://localhost:8000",
+        api_key=None,  # No auth for local
+        tools_requiring_approval={
+            "execute_sql": {"allowed_decisions": ["approve", "reject"]},
+            "send_email": True,  # All decisions allowed
+        }
+    )
 
     # Simulate a HITL interrupt with multiple tool calls
     print("\n2️⃣  Simulating HITL interrupt with tool calls...")
@@ -354,39 +362,20 @@ async def simple_example():
         "config": {}
     }
 
-    # Convert to reviews
-    reviews = adapter.to_universal(hitl_interrupt)
-    print(f"✅ Created {len(reviews)} review(s)")
-
-    # Create in database
-    review_ids = []
-    async with db.session() as session:
-        for review in reviews:
-            review_obj = await create_review(review, session)  # Fixed argument order
-            review_ids.append(review_obj.id)
-            await session.commit()
-            print(f"  ✓ Review #{review_obj.id}: {review.task_type}")
-
-    print("\n3️⃣  Reviews created and waiting for approval")
-    print("🌐 Open the Streamlit dashboard to review:")
-    print("   streamlit run frontend/streamlit_app.py")
-    print(f"\n📋 Review IDs: {review_ids}")
-
-    # Wait for decisions
-    print("\n⏳ Waiting for decisions (timeout: 5 minutes)...")
-    print("   Go to the dashboard and approve/reject/edit the reviews")
-
-    for review_id in review_ids:
-        try:
-            decision = await adapter.handle_blocking(review_id, timeout=300)
-            print(f"\n✅ Decision received for Review #{review_id}:")
-            print(f"   Type: {decision['type']}")
-            if decision.get('explanation'):
-                print(f"   Reason: {decision['explanation']}")
-            if decision.get('args'):
-                print(f"   Modified args: {decision['args']}")
-        except TimeoutError:
-            print(f"\n⏱️  Timeout for Review #{review_id}")
+    # Use adapter to handle the interrupt (creates reviews via API)
+    print("\n3️⃣  Creating reviews via Humancheck API...")
+    
+    # The adapter's handle_interrupt method will create reviews and wait for decisions
+    decisions = await adapter.handle_interrupt([{"value": hitl_interrupt}], {})
+    
+    print(f"\n✅ Received {len(decisions)} decision(s)")
+    for i, decision in enumerate(decisions, 1):
+        print(f"\n   Decision {i}:")
+        print(f"   Type: {decision['type']}")
+        if decision.get('message'):
+            print(f"   Message: {decision['message']}")
+        if decision.get('edited_action'):
+            print(f"   Edited: {decision['edited_action']}")
 
     print("\n" + "="*70)
     print("Example completed!")
