@@ -19,7 +19,6 @@ from .adapters import (
 from .config import HumancheckConfig, get_config, init_config
 from .database import Database, get_db, init_db
 from .models import Decision, DecisionType, Feedback, Review, ReviewStatus, UrgencyLevel
-from .platform_models import Agent, Organization, RoutingRule, Team, User
 from .routing import ConditionEvaluator, RoutingEngine
 
 __all__ = [
@@ -40,12 +39,6 @@ __all__ = [
     "ReviewStatus",
     "DecisionType",
     "UrgencyLevel",
-    # Platform Models
-    "Organization",
-    "User",
-    "Team",
-    "Agent",
-    "RoutingRule",
     # Adapters
     "ReviewAdapter",
     "UniversalReview",

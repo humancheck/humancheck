@@ -16,30 +16,19 @@ from .adapters import RestAdapter, get_adapter, register_adapter
 from .config import get_config
 from .database import get_db, init_db
 from .models import Attachment, ContentCategory, Decision, DecisionType, Feedback, Review, ReviewStatus
-from .platform_models import Agent, Organization, RoutingRule, Team, User
 from .routing import RoutingEngine
 from .security import validate_file
 from .security.content_validator import sanitize_filename
 from .storage import get_storage_manager
 from .schemas import (
-    AgentCreate,
-    AgentResponse,
     DecisionCreate,
     DecisionResponse,
     FeedbackCreate,
     FeedbackResponse,
-    OrganizationCreate,
-    OrganizationResponse,
     ReviewCreate,
     ReviewList,
     ReviewResponse,
     ReviewStats,
-    RoutingRuleCreate,
-    RoutingRuleResponse,
-    TeamCreate,
-    TeamResponse,
-    UserCreate,
-    UserResponse,
 )
 
 logger = logging.getLogger(__name__)
@@ -119,8 +108,6 @@ async def create_review(
             urgency=review_data.urgency.value,
             framework=review_data.framework,
             meta_data=review_data.metadata,
-            organization_id=review_data.organization_id,
-            agent_id=review_data.agent_id,
             status=ReviewStatus.PENDING.value,
         )
 
@@ -160,7 +147,6 @@ async def list_reviews(
     status: Optional[str] = Query(None, description="Filter by status"),
     framework: Optional[str] = Query(None, description="Filter by framework"),
     task_type: Optional[str] = Query(None, description="Filter by task type"),
-    organization_id: Optional[int] = Query(None, description="Filter by organization"),
     page: int = Query(1, ge=1, description="Page number"),
     page_size: int = Query(20, ge=1, le=100, description="Items per page"),
     session: AsyncSession = Depends(get_session),
@@ -176,8 +162,6 @@ async def list_reviews(
             query = query.where(Review.framework == framework)
         if task_type:
             query = query.where(Review.task_type == task_type)
-        if organization_id:
-            query = query.where(Review.organization_id == organization_id)
 
         # Get total count
         count_query = select(func.count()).select_from(query.subquery())
@@ -243,6 +227,7 @@ async def create_decision(
         decision = Decision(
             review_id=review_id,
             reviewer_id=decision_data.reviewer_id,
+            reviewer_name=decision_data.reviewer_name,
             decision_type=decision_data.decision_type.value,
             modified_action=decision_data.modified_action,
             notes=decision_data.notes,
@@ -319,15 +304,12 @@ async def submit_feedback(
 
 @app.get("/stats", response_model=ReviewStats)
 async def get_statistics(
-    organization_id: Optional[int] = Query(None, description="Filter by organization"),
     session: AsyncSession = Depends(get_session),
 ):
     """Get review statistics and analytics."""
     try:
         # Build base query
         query = select(Review)
-        if organization_id:
-            query = query.where(Review.organization_id == organization_id)
 
         result = await session.execute(query)
         reviews = list(result.scalars().all())
@@ -373,138 +355,6 @@ async def get_statistics(
 
     except Exception as e:
         logger.error(f"Error getting statistics: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-# ========== Organization Endpoints ==========
-
-@app.post("/organizations", response_model=OrganizationResponse, status_code=201)
-async def create_organization(
-    org_data: OrganizationCreate,
-    session: AsyncSession = Depends(get_session),
-):
-    """Create a new organization."""
-    try:
-        org = Organization(name=org_data.name, settings=org_data.settings)
-        session.add(org)
-        await session.commit()
-        await session.refresh(org)
-        return org
-    except Exception as e:
-        await session.rollback()
-        logger.error(f"Error creating organization: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-@app.get("/organizations/{org_id}", response_model=OrganizationResponse)
-async def get_organization(org_id: int, session: AsyncSession = Depends(get_session)):
-    """Get an organization by ID."""
-    org = await session.get(Organization, org_id)
-    if not org:
-        raise HTTPException(status_code=404, detail="Organization not found")
-    return org
-
-
-# ========== User Endpoints ==========
-
-@app.post("/users", response_model=UserResponse, status_code=201)
-async def create_user(
-    user_data: UserCreate,
-    session: AsyncSession = Depends(get_session),
-):
-    """Create a new user."""
-    try:
-        user = User(
-            email=user_data.email,
-            name=user_data.name,
-            role=user_data.role,
-            organization_id=user_data.organization_id,
-        )
-        session.add(user)
-        await session.commit()
-        await session.refresh(user)
-        return user
-    except Exception as e:
-        await session.rollback()
-        logger.error(f"Error creating user: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-# ========== Team Endpoints ==========
-
-@app.post("/teams", response_model=TeamResponse, status_code=201)
-async def create_team(
-    team_data: TeamCreate,
-    session: AsyncSession = Depends(get_session),
-):
-    """Create a new team."""
-    try:
-        team = Team(
-            name=team_data.name,
-            organization_id=team_data.organization_id,
-            settings=team_data.settings,
-        )
-        session.add(team)
-        await session.commit()
-        await session.refresh(team)
-        return team
-    except Exception as e:
-        await session.rollback()
-        logger.error(f"Error creating team: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-# ========== Agent Endpoints ==========
-
-@app.post("/agents", response_model=AgentResponse, status_code=201)
-async def create_agent(
-    agent_data: AgentCreate,
-    session: AsyncSession = Depends(get_session),
-):
-    """Register a new AI agent."""
-    try:
-        agent = Agent(
-            name=agent_data.name,
-            framework=agent_data.framework,
-            organization_id=agent_data.organization_id,
-            description=agent_data.description,
-            meta_data=agent_data.metadata,
-        )
-        session.add(agent)
-        await session.commit()
-        await session.refresh(agent)
-        return agent
-    except Exception as e:
-        await session.rollback()
-        logger.error(f"Error creating agent: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-# ========== Routing Rule Endpoints ==========
-
-@app.post("/routing-rules", response_model=RoutingRuleResponse, status_code=201)
-async def create_routing_rule(
-    rule_data: RoutingRuleCreate,
-    session: AsyncSession = Depends(get_session),
-):
-    """Create a new routing rule."""
-    try:
-        rule = RoutingRule(
-            name=rule_data.name,
-            organization_id=rule_data.organization_id,
-            priority=rule_data.priority,
-            conditions=rule_data.conditions,
-            assign_to_user_id=rule_data.assign_to_user_id,
-            assign_to_team_id=rule_data.assign_to_team_id,
-            is_active=rule_data.is_active,
-        )
-        session.add(rule)
-        await session.commit()
-        await session.refresh(rule)
-        return rule
-    except Exception as e:
-        await session.rollback()
-        logger.error(f"Error creating routing rule: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 

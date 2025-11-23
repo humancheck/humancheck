@@ -8,14 +8,14 @@ Humancheck enables AI agents to escalate uncertain or high-stakes decisions to h
 
 - **🔌 Universal Integration**: Works with any AI framework via adapter pattern
   - REST API (universal)
-  - MCP (Claude Desktop native)
   - LangChain/LangGraph
   - Mastra
   - Extensible for custom frameworks
+  - **Platform**: MCP (Claude Desktop native) - requires server
 
 - **🎯 Intelligent Routing**: Route reviews to the right people based on configurable rules
   - Rule-based assignment by task type, urgency, confidence score
-  - Team and user-based routing
+  - Config-based routing rules
   - Priority-based rule evaluation
 
 - **📊 Real-time Dashboard**: Streamlit-based UI for human reviewers
@@ -27,10 +27,10 @@ Humancheck enables AI agents to escalate uncertain or high-stakes decisions to h
   - Blocking: Wait for decision before proceeding
   - Non-blocking: Continue work, check back later
 
-- **🏢 Multi-tenancy**: Built-in support for organizations and teams
-  - Isolated workspaces
-  - User roles and permissions
-  - Team-based collaboration
+- **🔧 Flexible Configuration**: Simple YAML-based configuration
+  - Custom routing rules
+  - Default reviewers
+  - Configurable thresholds
 
 - **📈 Feedback Loop**: Continuous improvement through feedback
   - Rate decisions
@@ -127,7 +127,11 @@ async with httpx.AsyncClient() as client:
         print(decision.json())
 ```
 
-### MCP Integration (Claude Desktop)
+### MCP Integration (Claude Desktop) - Platform Only
+
+<Note>
+MCP integration requires a server and is only available in [Humancheck Platform](https://platform.humancheck.dev).
+</Note>
 
 Add to your Claude Desktop MCP configuration:
 
@@ -136,7 +140,11 @@ Add to your Claude Desktop MCP configuration:
   "mcpServers": {
     "humancheck": {
       "command": "humancheck",
-      "args": ["mcp"]
+      "args": ["mcp"],
+      "env": {
+        "HUMANCHECK_API_URL": "https://api.humancheck.dev",
+        "HUMANCHECK_API_KEY": "your-api-key-here"
+      }
     }
   }
 }
@@ -193,30 +201,24 @@ async def execute_with_review(proposed_action, confidence):
    - Framework-specific adapters convert to/from UniversalReview
 
 2. **Routing Engine**: Intelligent assignment of reviews
-   - Declarative JSON rules
+   - Config-based routing rules
    - Priority-based evaluation
    - Supports complex conditions
 
 3. **Dual Interface**:
-   - **REST API**: Universal HTTP integration
-   - **MCP Server**: Native Claude Desktop integration
+   - **REST API**: Universal HTTP integration (Open Source & Platform)
+   - **MCP Server**: Native Claude Desktop integration (Platform only - requires server)
 
-4. **Multi-tenancy**: Organizations, teams, users, agents
-
-5. **Dashboard**: Real-time Streamlit UI
+4. **Dashboard**: Real-time Streamlit UI
 
 ### Data Model
 
 ```
-Organizations
-  ├── Users (reviewers)
-  ├── Teams
-  ├── Agents (AI agents)
-  ├── Routing Rules
-  └── Reviews
-       ├── Decisions
-       ├── Feedback
-       └── Assignments
+Reviews
+  ├── Decisions
+  ├── Feedback
+  ├── Assignments
+  └── Attachments
 ```
 
 ## ⚙️ Configuration
@@ -254,9 +256,6 @@ humancheck init [--config-path PATH]
 # Start API + Dashboard
 humancheck start [--config PATH] [--host HOST] [--port PORT]
 
-# Run as MCP server
-humancheck mcp [--config PATH]
-
 # Check status
 humancheck status [--config PATH]
 
@@ -268,64 +267,39 @@ humancheck logs [--limit N] [--status-filter STATUS]
 
 ### Custom Routing Rules
 
-```python
-import httpx
+Configure routing rules in `humancheck.yaml`:
 
-# Create a routing rule
-async with httpx.AsyncClient() as client:
-    await client.post("http://localhost:8000/routing-rules", json={
-        "name": "High-value payments to finance team",
-        "organization_id": 1,
-        "priority": 10,
-        "conditions": {
-            "task_type": {"operator": "=", "value": "payment"},
-            "metadata.amount": {"operator": ">", "value": 10000}
-        },
-        "assign_to_team_id": 5,  # Finance team
-        "is_active": True
-    })
+```yaml
+routing_rules:
+  - name: "High-value payments to finance team"
+    priority: 10
+    conditions:
+      task_type: {"operator": "=", "value": "payment"}
+      metadata.amount: {"operator": ">", "value": 10000}
+    assign_to: "finance@example.com"
+    is_active: true
+  - name: "Urgent reviews to on-call"
+    priority: 20
+    conditions:
+      urgency: {"operator": "=", "value": "critical"}
+    assign_to: "oncall@example.com"
+    is_active: true
 ```
 
-### Multi-Organization Setup
+### Metadata Usage
+
+You can store additional information in the `metadata` field:
 
 ```python
-# Create organization
-org = await client.post("http://localhost:8000/organizations", json={
-    "name": "ACME Corp",
-    "settings": {"require_two_approvals": True}
-})
-
-# Create users
-user = await client.post("http://localhost:8000/users", json={
-    "email": "reviewer@acme.com",
-    "name": "Alice Smith",
-    "role": "reviewer",
-    "organization_id": org.json()["id"]
-})
-
-# Create team
-team = await client.post("http://localhost:8000/teams", json={
-    "name": "Compliance Team",
-    "organization_id": org.json()["id"]
-})
-```
-
-### Register Custom AI Agent
-
-```python
-agent = await client.post("http://localhost:8000/agents", json={
-    "name": "Payment Processor Bot",
-    "framework": "custom",
-    "organization_id": 1,
-    "description": "Processes vendor payments",
-    "metadata": {"version": "2.0.1"}
-})
-
-# Use agent_id in review requests
 await client.post("http://localhost:8000/reviews", json={
     "task_type": "payment",
-    "proposed_action": "...",
-    "agent_id": agent.json()["id"]
+    "proposed_action": "Pay $5,000",
+    "metadata": {
+        "organization": "acme-corp",
+        "agent": "payment-bot-v2",
+        "amount": 5000,
+        "currency": "USD"
+    }
 })
 ```
 
@@ -347,15 +321,37 @@ Once running, visit:
 
 ## 🗺️ Roadmap
 
-- [ ] Slack/Teams notifications
-- [ ] Email notifications
-- [ ] Webhook support for decisions
-- [ ] Advanced analytics and reporting
-- [ ] Mobile app for reviewers
-- [ ] A/B testing for routing rules
-- [ ] ML-powered routing suggestions
-- [ ] Audit log export
-- [ ] SSO integration
+### Core Features (Open Source)
+
+- [x] Core HITL functionality
+- [x] Framework adapters (REST, LangChain, Mastra)
+- [x] Basic routing (config-based)
+- [x] Attachments and preview
+- [x] Connectors (Slack, email)
+- [ ] Additional connector types
+- [ ] Enhanced dashboard features
+- [ ] Improved routing rule conditions
+- [ ] Community contributions
+
+### Advanced Features (Platform)
+
+Advanced features are available in [Humancheck Platform](https://platform.humancheck.dev):
+
+- ✅ MCP (Claude Desktop native) - requires server
+- ✅ Advanced routing rules (database-backed, UI control, prioritization, fine-grained ACL)
+- ✅ Dozens of built-in connectors (instant UI setup)
+- ✅ No-code integrations (n8n, Zapier, Gumloop, etc.)
+- ✅ Multi-user approval workflows
+- ✅ Webhooks with retry logic
+- ✅ Advanced analytics
+- ✅ Organizations, Users, Teams
+- ✅ Evals framework
+- ✅ OAuth connectors
+- ✅ Audit logs
+
+<Note>
+For production deployments with advanced features, check out [Humancheck Platform](https://platform.humancheck.dev) - the managed cloud service with enterprise-grade features.
+</Note>
 
 ## 🤝 Contributing
 
@@ -377,9 +373,7 @@ Built with:
 ## 💬 Support
 
 - Documentation: [docs.humancheck.dev](https://docs.humancheck.dev)
-- Issues: [GitHub Issues](https://github.com/yourusername/humancheck/issues)
+- Issues: [GitHub Issues](https://github.com/humancheck/humancheck/issues)
 - Discord: [Join our community](https://discord.gg/humancheck)
 
 ---
-
-Made with ❤️ for building safer, more accountable AI systems.

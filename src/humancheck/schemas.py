@@ -16,9 +16,7 @@ class ReviewCreate(BaseModel):
     confidence_score: Optional[float] = Field(None, ge=0.0, le=1.0, description="Confidence score (0-1)")
     urgency: UrgencyLevel = Field(default=UrgencyLevel.MEDIUM, description="Urgency level")
     framework: Optional[str] = Field(None, max_length=100, description="AI framework name")
-    metadata: Optional[dict[str, Any]] = Field(None, description="Additional metadata")
-    organization_id: Optional[int] = Field(None, description="Organization ID for multi-tenancy")
-    agent_id: Optional[int] = Field(None, description="Agent ID")
+    metadata: Optional[dict[str, Any]] = Field(None, description="Additional metadata (can include organization_id, agent_id, etc.)")
     blocking: bool = Field(default=False, description="Whether to block until decision")
 
     model_config = ConfigDict(use_enum_values=True)
@@ -35,8 +33,6 @@ class ReviewResponse(BaseModel):
     framework: Optional[str]
     status: str
     metadata: Optional[dict[str, Any]] = Field(None, alias="meta_data")
-    organization_id: Optional[int]
-    agent_id: Optional[int]
     created_at: datetime
     updated_at: datetime
 
@@ -57,7 +53,8 @@ class DecisionCreate(BaseModel):
     decision_type: DecisionType = Field(..., description="Type of decision")
     modified_action: Optional[str] = Field(None, description="Modified action if decision is MODIFY")
     notes: Optional[str] = Field(None, description="Additional notes")
-    reviewer_id: Optional[int] = Field(None, description="ID of the reviewer")
+    reviewer_id: Optional[int] = Field(None, description="Optional reviewer ID (for tracking)")
+    reviewer_name: Optional[str] = Field(None, description="Reviewer name/email identifier")
 
     @field_validator("modified_action")
     @classmethod
@@ -75,6 +72,7 @@ class DecisionResponse(BaseModel):
     id: int
     review_id: int
     reviewer_id: Optional[int]
+    reviewer_name: Optional[str]
     decision_type: str
     modified_action: Optional[str]
     notes: Optional[str]
@@ -97,122 +95,6 @@ class FeedbackResponse(BaseModel):
     rating: Optional[int]
     comment: Optional[str]
     timestamp: datetime
-
-    model_config = ConfigDict(from_attributes=True)
-
-
-# Organization schemas
-class OrganizationCreate(BaseModel):
-    """Schema for creating an organization."""
-    name: str = Field(..., min_length=1, max_length=255)
-    settings: Optional[dict[str, Any]] = None
-
-
-class OrganizationResponse(BaseModel):
-    """Schema for organization response."""
-    id: int
-    name: str
-    settings: Optional[dict[str, Any]]
-    created_at: datetime
-
-    model_config = ConfigDict(from_attributes=True)
-
-
-# User schemas
-class UserCreate(BaseModel):
-    """Schema for creating a user."""
-    email: str = Field(..., max_length=255)
-    name: str = Field(..., min_length=1, max_length=255)
-    role: str = Field(default="reviewer", pattern="^(admin|reviewer|viewer)$")
-    organization_id: int
-
-
-class UserResponse(BaseModel):
-    """Schema for user response."""
-    id: int
-    email: str
-    name: str
-    role: str
-    organization_id: int
-    is_active: bool
-    created_at: datetime
-
-    model_config = ConfigDict(from_attributes=True)
-
-
-# Team schemas
-class TeamCreate(BaseModel):
-    """Schema for creating a team."""
-    name: str = Field(..., min_length=1, max_length=255)
-    organization_id: int
-    settings: Optional[dict[str, Any]] = None
-
-
-class TeamResponse(BaseModel):
-    """Schema for team response."""
-    id: int
-    name: str
-    organization_id: int
-    settings: Optional[dict[str, Any]]
-    created_at: datetime
-
-    model_config = ConfigDict(from_attributes=True)
-
-
-# Agent schemas
-class AgentCreate(BaseModel):
-    """Schema for creating an agent."""
-    name: str = Field(..., min_length=1, max_length=255)
-    framework: str = Field(..., min_length=1, max_length=100)
-    organization_id: int
-    description: Optional[str] = None
-    metadata: Optional[dict[str, Any]] = None
-
-
-class AgentResponse(BaseModel):
-    """Schema for agent response."""
-    id: int
-    name: str
-    framework: str
-    organization_id: int
-    description: Optional[str]
-    metadata: Optional[dict[str, Any]] = Field(None, alias="meta_data")
-    created_at: datetime
-
-    model_config = ConfigDict(from_attributes=True, populate_by_name=True)
-
-
-# Routing Rule schemas
-class RoutingRuleCreate(BaseModel):
-    """Schema for creating a routing rule."""
-    name: str = Field(..., min_length=1, max_length=255)
-    organization_id: int
-    priority: int = Field(default=0, description="Higher priority rules are evaluated first")
-    conditions: dict[str, Any] = Field(..., description="Condition rules in JSON format")
-    assign_to_user_id: Optional[int] = None
-    assign_to_team_id: Optional[int] = None
-    is_active: bool = True
-
-    @field_validator("conditions")
-    @classmethod
-    def validate_conditions(cls, v: dict[str, Any]) -> dict[str, Any]:
-        """Validate that conditions is a non-empty dict."""
-        if not v:
-            raise ValueError("conditions must be a non-empty dictionary")
-        return v
-
-
-class RoutingRuleResponse(BaseModel):
-    """Schema for routing rule response."""
-    id: int
-    name: str
-    organization_id: int
-    priority: int
-    conditions: dict[str, Any]
-    assign_to_user_id: Optional[int]
-    assign_to_team_id: Optional[int]
-    is_active: bool
-    created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
 

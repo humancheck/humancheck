@@ -61,11 +61,6 @@ class HumancheckConfig(BaseSettings):
     enable_auth: bool = Field(default=False, description="Enable authentication")
     api_key: Optional[str] = Field(default=None, description="API key for authentication")
 
-    # Multi-tenancy
-    default_organization_name: str = Field(
-        default="Default Organization",
-        description="Default organization name"
-    )
 
     model_config = SettingsConfigDict(
         env_prefix="HUMANCHECK_",

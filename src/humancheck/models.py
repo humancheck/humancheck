@@ -61,13 +61,8 @@ class Review(Base):
     )
     meta_data: Mapped[Optional[dict]] = mapped_column("metadata", JSON, nullable=True)
 
-    # Multi-tenancy fields
-    organization_id: Mapped[Optional[int]] = mapped_column(
-        Integer, ForeignKey("organizations.id", ondelete="CASCADE"), nullable=True, index=True
-    )
-    agent_id: Mapped[Optional[int]] = mapped_column(
-        Integer, ForeignKey("agents.id", ondelete="SET NULL"), nullable=True, index=True
-    )
+    # Optional metadata fields (for platform compatibility, stored in metadata)
+    # organization_id and agent_id can be stored in meta_data if needed
 
     # Timestamps
     created_at: Mapped[datetime] = mapped_column(
@@ -93,8 +88,6 @@ class Review(Base):
     attachments: Mapped[list["Attachment"]] = relationship(
         "Attachment", back_populates="review", cascade="all, delete-orphan"
     )
-    organization: Mapped[Optional["Organization"]] = relationship("Organization", back_populates="reviews")
-    agent: Mapped[Optional["Agent"]] = relationship("Agent", back_populates="reviews")
 
     def __repr__(self) -> str:
         return f"<Review(id={self.id}, task_type='{self.task_type}', status='{self.status}')>"
@@ -163,8 +156,9 @@ class Decision(Base):
         Integer, ForeignKey("reviews.id", ondelete="CASCADE"), nullable=False, unique=True, index=True
     )
     reviewer_id: Mapped[Optional[int]] = mapped_column(
-        Integer, ForeignKey("users.id", ondelete="SET NULL"), nullable=True, index=True
-    )
+        Integer, nullable=True, index=True
+    )  # Optional reviewer ID (can be used for tracking, no FK)
+    reviewer_name: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)  # Reviewer identifier
     decision_type: Mapped[str] = mapped_column(String(50), nullable=False)
     modified_action: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     notes: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
@@ -174,7 +168,6 @@ class Decision(Base):
 
     # Relationships
     review: Mapped["Review"] = relationship("Review", back_populates="decision")
-    reviewer: Mapped[Optional["User"]] = relationship("User", back_populates="decisions")
 
     def __repr__(self) -> str:
         return f"<Decision(id={self.id}, review_id={self.review_id}, decision_type='{self.decision_type}')>"
@@ -212,23 +205,26 @@ class ReviewAssignment(Base):
         Integer, ForeignKey("reviews.id", ondelete="CASCADE"), nullable=False, index=True
     )
     user_id: Mapped[Optional[int]] = mapped_column(
-        Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=True, index=True
-    )
+        Integer, nullable=True, index=True
+    )  # Optional user ID (no FK, for tracking)
+    reviewer_identifier: Mapped[Optional[str]] = mapped_column(
+        String(255), nullable=True, index=True
+    )  # Reviewer email/name identifier
     team_id: Mapped[Optional[int]] = mapped_column(
-        Integer, ForeignKey("teams.id", ondelete="CASCADE"), nullable=True, index=True
-    )
+        Integer, nullable=True, index=True
+    )  # Optional team ID (no FK, for tracking)
+    team_name: Mapped[Optional[str]] = mapped_column(
+        String(255), nullable=True
+    )  # Team name identifier
     assigned_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )
     assigned_by_rule_id: Mapped[Optional[int]] = mapped_column(
-        Integer, ForeignKey("routing_rules.id", ondelete="SET NULL"), nullable=True
-    )
+        Integer, nullable=True
+    )  # Optional rule ID (no FK)
 
     # Relationships
     review: Mapped["Review"] = relationship("Review", back_populates="assignments")
-    user: Mapped[Optional["User"]] = relationship("User", back_populates="assignments")
-    team: Mapped[Optional["Team"]] = relationship("Team", back_populates="assignments")
-    rule: Mapped[Optional["RoutingRule"]] = relationship("RoutingRule", back_populates="assignments")
 
     def __repr__(self) -> str:
         return f"<ReviewAssignment(id={self.id}, review_id={self.review_id}, user_id={self.user_id})>"
@@ -236,4 +232,3 @@ class ReviewAssignment(Base):
 
 # Import to avoid circular dependency
 from .connector_models import NotificationLog
-from .platform_models import Agent, Organization, RoutingRule, Team, User

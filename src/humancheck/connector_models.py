@@ -21,9 +21,9 @@ class ConnectorConfig(Base):
     config_data: Mapped[dict] = mapped_column(JSON, nullable=False)  # API keys, endpoints, etc.
     enabled: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True, index=True)
 
-    # Multi-tenancy
+    # Optional organization identifier (stored as metadata, no FK)
     organization_id: Mapped[Optional[int]] = mapped_column(
-        Integer, ForeignKey("organizations.id", ondelete="CASCADE"), nullable=True, index=True
+        Integer, nullable=True, index=True
     )
 
     # Timestamps
@@ -112,9 +112,9 @@ class ConnectorRoutingRule(Base):
     recipients: Mapped[list] = mapped_column(JSON, nullable=False)
     # Example: ["#database-team", "@john.doe"]
 
-    # Multi-tenancy
+    # Optional organization identifier (stored as metadata, no FK)
     organization_id: Mapped[Optional[int]] = mapped_column(
-        Integer, ForeignKey("organizations.id", ondelete="CASCADE"), nullable=True, index=True
+        Integer, nullable=True, index=True
     )
 
     # Timestamps
@@ -134,4 +134,3 @@ class ConnectorRoutingRule(Base):
 
 # Import to avoid circular dependency
 from .models import Review
-from .platform_models import Organization
