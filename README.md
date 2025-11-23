@@ -4,39 +4,39 @@
 
 Humancheck enables AI agents to escalate uncertain or high-stakes decisions to human reviewers for approval. It's framework-agnostic, works with any AI system, and provides a complete platform for managing human oversight at scale.
 
-## ✨ Key Features
+## Key Features
 
-- **🔌 Universal Integration**: Works with any AI framework via adapter pattern
+- **Universal Integration**: Works with any AI framework via adapter pattern
   - REST API (universal)
   - LangChain/LangGraph
   - Extensible for custom frameworks
   - **Platform**: MCP (Claude Desktop native) - requires server
 
-- **🎯 Intelligent Routing**: Route reviews to the right people based on configurable rules
+- **Intelligent Routing**: Route reviews to the right people based on configurable rules
   - Rule-based assignment by task type, urgency, confidence score
   - Config-based routing rules
   - Priority-based rule evaluation
 
-- **📊 Real-time Dashboard**: Streamlit-based UI for human reviewers
+- **Real-time Dashboard**: Streamlit-based UI for human reviewers
   - Live review queue
   - One-click approve/reject/modify
   - Statistics and analytics
 
-- **🔄 Flexible Workflows**: Support for both blocking and non-blocking patterns
+- **Flexible Workflows**: Support for both blocking and non-blocking patterns
   - Blocking: Wait for decision before proceeding
   - Non-blocking: Continue work, check back later
 
-- **🔧 Flexible Configuration**: Simple YAML-based configuration
+- **Flexible Configuration**: Simple YAML-based configuration
   - Custom routing rules
   - Default reviewers
   - Configurable thresholds
 
-- **📈 Feedback Loop**: Continuous improvement through feedback
+- **Feedback Loop**: Continuous improvement through feedback
   - Rate decisions
   - Comment on reviews
   - Track metrics
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Installation
 
@@ -97,7 +97,7 @@ asyncio.run(request_review())
 
 Open the dashboard at http://localhost:8501 to approve/reject the review!
 
-## 📚 Usage Examples
+## Usage Examples
 
 ### REST API Integration
 
@@ -191,7 +191,7 @@ async def execute_with_review(proposed_action, confidence):
                 return None
 ```
 
-## 🏗️ Architecture
+## Architecture
 
 ### Core Components
 
@@ -220,7 +220,7 @@ Reviews
   └── Attachments
 ```
 
-## ⚙️ Configuration
+## Configuration
 
 Edit `humancheck.yaml`:
 
@@ -246,7 +246,7 @@ export HUMANCHECK_API_PORT=8000
 export HUMANCHECK_DB_PATH=/var/lib/humancheck/db.sqlite
 ```
 
-## 🎛️ CLI Commands
+## CLI Commands
 
 ```bash
 # Initialize configuration
@@ -262,7 +262,7 @@ humancheck status [--config PATH]
 humancheck logs [--limit N] [--status-filter STATUS]
 ```
 
-## 🔧 Advanced Usage
+## Advanced Usage
 
 ### Custom Routing Rules
 
@@ -302,7 +302,7 @@ await client.post("http://localhost:8000/reviews", json={
 })
 ```
 
-## 🧪 Testing
+## Testing
 
 ```bash
 # Run tests
@@ -312,13 +312,13 @@ pytest
 pytest --cov=humancheck tests/
 ```
 
-## 📖 API Documentation
+## API Documentation
 
 Once running, visit:
 - API docs: http://localhost:8000/docs
 - Alternative docs: http://localhost:8000/redoc
 
-## 🗺️ Roadmap
+## Roadmap
 
 ### Core Features (Open Source)
 
@@ -352,15 +352,15 @@ Advanced features are available in [Humancheck Platform](https://platform.humanc
 For production deployments with advanced features, check out [Humancheck Platform](https://platform.humancheck.dev) - the managed cloud service with enterprise-grade features.
 </Note>
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
-## 📄 License
+## License
 
 MIT License - see [LICENSE](LICENSE) for details.
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 Built with:
 - [FastAPI](https://fastapi.tiangolo.com/)
@@ -369,10 +369,9 @@ Built with:
 - [Pydantic](https://pydantic-docs.helpmanual.io/)
 - [MCP](https://github.com/anthropics/mcp)
 
-## 💬 Support
+## Support
 
 - Documentation: [docs.humancheck.dev](https://docs.humancheck.dev)
 - Issues: [GitHub Issues](https://github.com/humancheck/humancheck/issues)
-- Discord: [Join our community](https://discord.gg/humancheck)
 
 ---
