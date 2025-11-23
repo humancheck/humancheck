@@ -47,7 +47,7 @@ pip install humancheck
 Or install from source:
 
 ```bash
-git clone https://github.com/yourusername/humancheck.git
+git clone https://github.com/humancheck/humancheck.git
 cd humancheck
 poetry install
 ```
