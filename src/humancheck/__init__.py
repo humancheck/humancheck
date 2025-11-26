@@ -3,7 +3,7 @@
 A universal platform that enables AI agents to escalate uncertain or
 high-stakes decisions to human reviewers for approval.
 """
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 
 from .adapters import (
     HumancheckLangchainAdapter,
