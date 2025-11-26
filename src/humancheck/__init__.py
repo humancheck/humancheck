@@ -17,7 +17,7 @@ from .adapters import (
 )
 from .config import HumancheckConfig, get_config, init_config
 from .database import Database, get_db, init_db
-from .models import Decision, DecisionType, Feedback, Review, ReviewStatus, UrgencyLevel
+from .models import Attachment, Decision, DecisionType, Feedback, Review, ReviewStatus, UrgencyLevel
 from .routing import ConditionEvaluator, RoutingEngine
 
 __all__ = [
@@ -35,6 +35,7 @@ __all__ = [
     "Review",
     "Decision",
     "Feedback",
+    "Attachment",
     "ReviewStatus",
     "DecisionType",
     "UrgencyLevel",
