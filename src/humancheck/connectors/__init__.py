@@ -1,5 +1,4 @@
-"""Communication channel connectors for review notifications."""
-from .base import ReviewConnector
-from .slack import SlackConnector
+"""Backward compatibility shim for connectors - re-exports from core."""
+from ..core.integrations import ReviewConnector, SlackConnector
 
 __all__ = ['ReviewConnector', 'SlackConnector']
