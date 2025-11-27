@@ -15,7 +15,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from .adapters import RestAdapter, get_adapter, register_adapter
 from .config import get_config
 from .database import get_db, init_db
-from .models import Attachment, ContentCategory, Decision, DecisionType, Feedback, Review, ReviewStatus
+from .models import Attachment, ContentCategory, Decision, DecisionType, Feedback, Review, ReviewStatus, UrgencyLevel
 from .routing import RoutingEngine
 from .security import validate_file
 from .security.content_validator import sanitize_filename
@@ -105,7 +105,7 @@ async def create_review(
             proposed_action=review_data.proposed_action,
             agent_reasoning=review_data.agent_reasoning,
             confidence_score=review_data.confidence_score,
-            urgency=review_data.urgency.value,
+            urgency=review_data.urgency.value if isinstance(review_data.urgency, UrgencyLevel) else str(review_data.urgency),
             framework=review_data.framework,
             meta_data=review_data.metadata,
             status=ReviewStatus.PENDING.value,
