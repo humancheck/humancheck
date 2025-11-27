@@ -72,8 +72,8 @@ def create_test_tools():
 
 async def setup_humancheck_integration():
     """Initialize humancheck database and get session factory."""
-    from humancheck.config import init_config
-    from humancheck.database import init_db
+    from humancheck.core.config.settings import init_config
+    from humancheck.core.storage.database import init_db
 
     config = init_config()
     db = init_db(config.get_database_url())
@@ -140,7 +140,7 @@ async def handle_tool_calls_with_humancheck(tool_calls, db_session_factory, conf
     Returns:
         List of decisions for each tool call
     """
-    from humancheck.adapters.langchain import HumancheckLangchainAdapter
+    from humancheck.core.adapters.langchain import HumancheckLangchainAdapter
     
     # For self-hosted, use local API URL
     adapter = HumancheckLangchainAdapter(
@@ -309,9 +309,9 @@ async def simple_example():
 
     # Initialize humancheck
     print("\n1️⃣  Initializing humancheck...")
-    from humancheck.config import init_config
-    from humancheck.database import init_db
-    from humancheck.adapters.langchain import HumancheckLangchainAdapter
+    from humancheck.core.config.settings import init_config
+    from humancheck.core.storage.database import init_db
+    from humancheck.core.adapters.langchain import HumancheckLangchainAdapter
     import httpx
 
     print("✅ Using Humancheck adapter")

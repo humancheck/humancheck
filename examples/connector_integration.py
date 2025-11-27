@@ -11,10 +11,10 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
-from humancheck.config import init_config
-from humancheck.connector_manager import ConnectorManager
-from humancheck.database import init_db
-from humancheck.models import DecisionType, Review, ReviewStatus, UrgencyLevel
+from humancheck.core.config.settings import init_config
+from humancheck.core.integrations.manager import ConnectorManager
+from humancheck.core.storage.database import init_db
+from humancheck.core.models import DecisionType, Review, ReviewStatus, UrgencyLevel
 
 
 async def setup_example_connector_and_rules():
@@ -145,7 +145,7 @@ async def example_send_decision_notification():
 
         # Get a review with a decision
         from sqlalchemy import select
-        from humancheck.models import Decision
+        from humancheck.core.models import Decision
 
         result = await session.execute(
             select(Review)

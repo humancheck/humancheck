@@ -29,7 +29,7 @@ from langgraph.checkpoint.memory import MemorySaver
 from langgraph.types import Command
 
 # Import Humancheck LangChain adapter (replaces LangChain's HITL middleware)
-from humancheck.adapters.langchain import HumancheckLangchainAdapter
+from humancheck.core.adapters.langchain import HumancheckLangchainAdapter
 
 
 # Humancheck Platform Configuration

@@ -3,9 +3,9 @@
 A universal platform that enables AI agents to escalate uncertain or
 high-stakes decisions to human reviewers for approval.
 """
-__version__ = "0.1.2"
+__version__ = "0.1.3"
 
-# Re-export from core for backward compatibility
+# Export from core
 from .core.adapters import (
     HumancheckLangchainAdapter,
     McpAdapter,
@@ -44,7 +44,7 @@ from .core.schemas import (
     ReviewStats,
 )
 
-# Also export new core structure for platform edition
+# Export core module for direct access
 from . import core
 
 __all__ = [

@@ -13,9 +13,9 @@ from pathlib import Path
 import streamlit as st
 
 # Import humancheck - works both in development and when installed
-from humancheck.config import get_config, init_config
-from humancheck.database import init_db
-from humancheck.models import Attachment, Decision, DecisionType, Review, ReviewStatus
+from humancheck.core.config.settings import get_config, init_config
+from humancheck.core.storage.database import init_db
+from humancheck.core.models import Attachment, Decision, DecisionType, Review, ReviewStatus
 from humancheck.dashboard.preview import render_preview_panel
 
 

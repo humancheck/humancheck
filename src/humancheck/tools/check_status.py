@@ -1,8 +1,8 @@
 """MCP tool for checking review status."""
 from typing import Any
 
-from ..database import get_db
-from ..models import Review
+from ..core.storage.database import get_db
+from ..core.models import Review
 
 
 async def check_review_status(review_id: int) -> dict[str, Any]:

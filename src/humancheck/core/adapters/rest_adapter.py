@@ -2,7 +2,7 @@
 import asyncio
 from typing import Any, Optional
 
-from ...models import DecisionType, ReviewStatus, UrgencyLevel
+from ..models import DecisionType, ReviewStatus, UrgencyLevel
 from .base import ReviewAdapter, UniversalReview
 
 

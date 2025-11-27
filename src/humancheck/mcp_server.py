@@ -11,8 +11,8 @@ from mcp.server import Server
 from mcp.server.stdio import stdio_server
 from mcp.types import Tool, TextContent
 
-from .config import get_config, init_config
-from .database import init_db
+from .core.config.settings import get_config, init_config
+from .core.storage.database import init_db
 from .tools.check_status import check_review_status
 from .tools.get_decision import get_review_decision
 from .tools.request_review import request_review

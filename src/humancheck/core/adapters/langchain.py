@@ -31,7 +31,7 @@ from typing import Any, Dict, List, Optional
 
 import httpx
 
-from ...models import DecisionType, ReviewStatus, UrgencyLevel
+from ..models import DecisionType, ReviewStatus, UrgencyLevel
 from .base import ReviewAdapter, UniversalReview
 
 
