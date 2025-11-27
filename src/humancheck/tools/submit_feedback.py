@@ -1,8 +1,8 @@
 """MCP tool for submitting feedback on reviews."""
 from typing import Any, Optional
 
-from ..database import get_db
-from ..models import Feedback, Review
+from ..core.storage.database import get_db
+from ..core.models import Feedback, Review
 
 
 async def submit_feedback(

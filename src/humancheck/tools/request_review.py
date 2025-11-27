@@ -1,11 +1,11 @@
 """MCP tool for requesting human review."""
 from typing import Any, Optional
 
-from ..adapters import McpAdapter, UniversalReview
-from ..config import get_config
-from ..database import get_db
-from ..models import Review, ReviewStatus, UrgencyLevel
-from ..routing import RoutingEngine
+from ..core.adapters import McpAdapter, UniversalReview
+from ..core.config.settings import get_config
+from ..core.storage.database import get_db
+from ..core.models import Review, ReviewStatus, UrgencyLevel
+from ..core.routing import RoutingEngine
 
 
 async def request_review(

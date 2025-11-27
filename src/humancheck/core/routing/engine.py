@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Session
 
 from ..config.settings import get_config
-from ...models import Review, ReviewAssignment
+from ..models import Review, ReviewAssignment
 from .evaluator import ConditionEvaluator
 
 

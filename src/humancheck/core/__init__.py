@@ -1,8 +1,9 @@
 """Humancheck core library - shared components for community and platform editions."""
 # Export main components
+# Import storage first since models depend on it
+from . import storage
 from . import models
 from . import schemas
-from . import storage
 from . import routing
 from . import integrations
 from . import adapters

@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Any, Optional
 
-from ...models import UrgencyLevel
+from ..models import UrgencyLevel
 
 
 @dataclass

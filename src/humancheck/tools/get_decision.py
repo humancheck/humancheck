@@ -1,9 +1,9 @@
 """MCP tool for getting review decision."""
 from typing import Any, Optional
 
-from ..adapters import McpAdapter
-from ..database import get_db
-from ..models import Decision, Review, UrgencyLevel
+from ..core.adapters import McpAdapter
+from ..core.storage.database import get_db
+from ..core.models import Decision, Review, UrgencyLevel
 
 
 async def get_review_decision(review_id: int) -> dict[str, Any]:
@@ -71,7 +71,7 @@ async def get_review_decision(review_id: int) -> dict[str, Any]:
         # Use MCP adapter to format the response
         adapter = McpAdapter(db.session)
 
-        from ..adapters import UniversalReview
+        from ..core.adapters import UniversalReview
 
         universal_review = UniversalReview(
             task_type=review.task_type,

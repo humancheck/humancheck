@@ -12,7 +12,7 @@ from pathlib import Path
 import click
 import uvicorn
 
-from .config import HumancheckConfig, get_config, init_config
+from .core.config.settings import HumancheckConfig, get_config, init_config
 
 
 @click.group()
