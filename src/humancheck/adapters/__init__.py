@@ -1,9 +1,15 @@
-"""Adapter package for framework integrations."""
-from .base import ReviewAdapter, UniversalReview
-from .langchain import HumancheckLangchainAdapter
-from .mcp_adapter import McpAdapter
-from .registry import AdapterRegistry, get_adapter, get_registry, register_adapter
-from .rest_adapter import RestAdapter
+"""Backward compatibility shim for adapters - re-exports from core."""
+from ..core.adapters import (
+    ReviewAdapter,
+    UniversalReview,
+    AdapterRegistry,
+    get_registry,
+    register_adapter,
+    get_adapter,
+    RestAdapter,
+    McpAdapter,
+    HumancheckLangchainAdapter,
+)
 
 __all__ = [
     "ReviewAdapter",

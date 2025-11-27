@@ -3,9 +3,10 @@
 A universal platform that enables AI agents to escalate uncertain or
 high-stakes decisions to human reviewers for approval.
 """
-__version__ = "0.1.1"
+__version__ = "0.1.2"
 
-from .adapters import (
+# Re-export from core for backward compatibility
+from .core.adapters import (
     HumancheckLangchainAdapter,
     McpAdapter,
     RestAdapter,
@@ -15,10 +16,36 @@ from .adapters import (
     get_registry,
     register_adapter,
 )
-from .config import HumancheckConfig, get_config, init_config
-from .database import Database, get_db, init_db
-from .models import Attachment, Decision, DecisionType, Feedback, Review, ReviewStatus, UrgencyLevel
-from .routing import ConditionEvaluator, RoutingEngine
+from .core.config.settings import HumancheckConfig, get_config, init_config
+from .core.storage.database import Database, get_db, init_db
+from .core.models import (
+    Attachment,
+    Decision,
+    DecisionType,
+    Feedback,
+    Review,
+    ReviewStatus,
+    UrgencyLevel,
+    ReviewAssignment,
+    ContentCategory,
+    ConnectorConfig,
+    NotificationLog,
+    ConnectorRoutingRule,
+)
+from .core.routing import ConditionEvaluator, RoutingEngine
+from .core.schemas import (
+    DecisionCreate,
+    DecisionResponse,
+    FeedbackCreate,
+    FeedbackResponse,
+    ReviewCreate,
+    ReviewList,
+    ReviewResponse,
+    ReviewStats,
+)
+
+# Also export new core structure for platform edition
+from . import core
 
 __all__ = [
     # Version
@@ -36,9 +63,23 @@ __all__ = [
     "Decision",
     "Feedback",
     "Attachment",
+    "ReviewAssignment",
     "ReviewStatus",
     "DecisionType",
     "UrgencyLevel",
+    "ContentCategory",
+    "ConnectorConfig",
+    "NotificationLog",
+    "ConnectorRoutingRule",
+    # Schemas
+    "ReviewCreate",
+    "ReviewResponse",
+    "ReviewList",
+    "ReviewStats",
+    "DecisionCreate",
+    "DecisionResponse",
+    "FeedbackCreate",
+    "FeedbackResponse",
     # Adapters
     "ReviewAdapter",
     "UniversalReview",
@@ -51,4 +92,6 @@ __all__ = [
     # Routing
     "RoutingEngine",
     "ConditionEvaluator",
+    # Core module
+    "core",
 ]

@@ -3,8 +3,8 @@ import pytest
 from httpx import AsyncClient
 
 from humancheck.api import app
-from humancheck.config import init_config
-from humancheck.database import init_db
+from humancheck.core.config.settings import init_config
+from humancheck.core.storage.database import init_db
 
 
 @pytest.fixture

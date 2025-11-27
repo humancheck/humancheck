@@ -1,6 +1,6 @@
 [project]
 name = "humancheck-core"
-version = "0.1.1"
+version = "0.1.2"
 description = "A universal human-in-the-loop operations platform for AI agents"
 authors = [
     {name = "Humancheck", email = "hi@humancheck.dev"}
